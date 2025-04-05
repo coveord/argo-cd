@@ -2,14 +2,24 @@ name: Snyk report update
 on:
   schedule:
     - cron: '0 0 * * 0' # midnight every Sunday
+permissions:
+  contents: read
+
 jobs:
   snyk-report:
+    permissions:
+      contents: write  # for Git to git push
     if: github.repository == 'argoproj/argo-cd'
     name: Update Snyk report in the docs directory
     runs-on: ubuntu-22.04
     steps:
+      - name: Harden the runner (Audit all outbound calls)
+        uses: step-security/harden-runner@c6295a65d1254861815972266d5933fd6e532bdf # v2.11.1
+        with:
+          egress-policy: audit
+
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@ee0669bd1cc54295c223e0bb666b733df41de1c5 # v2.7.0
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
       - name: Build reports
